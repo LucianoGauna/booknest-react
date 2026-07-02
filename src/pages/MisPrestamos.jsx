@@ -2,30 +2,10 @@ import { Link } from "react-router-dom";
 import { Button } from "primereact/button";
 import { Column } from "primereact/column";
 import { DataTable } from "primereact/datatable";
-import { Tag } from "primereact/tag";
+import LoanStatusTag from "../components/LoanStatusTag";
 import PageHeader from "../components/PageHeader";
 import { useAuth } from "../context/useAuth";
 import { useLibrary } from "../context/useLibrary";
-
-function getStatusSeverity(status) {
-  if (status === "Pendiente") {
-    return "warning";
-  }
-
-  if (status === "Aprobado") {
-    return "success";
-  }
-
-  if (status === "Rechazado") {
-    return "danger";
-  }
-
-  if (status === "Devuelto") {
-    return "info";
-  }
-
-  return "secondary";
-}
 
 export default function MisPrestamos() {
   const { user } = useAuth();
@@ -53,12 +33,7 @@ export default function MisPrestamos() {
   }
 
   function statusBodyTemplate(rowData) {
-    return (
-      <Tag
-        value={rowData.status}
-        severity={getStatusSeverity(rowData.status)}
-      />
-    );
+    return <LoanStatusTag status={rowData.status} />;
   }
 
   function actionsBodyTemplate(rowData) {

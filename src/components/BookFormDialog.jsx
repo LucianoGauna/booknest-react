@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
 import { InputNumber } from "primereact/inputnumber";
 import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
+import { Toast } from "primereact/toast";
 
 const emptyForm = {
   title: "",
@@ -31,9 +32,15 @@ function getInitialForm(initialBook) {
   };
 }
 
-export default function BookFormDialog({ visible, onHide, onSave, initialBook }) {
+export default function BookFormDialog({
+  visible,
+  onHide,
+  onSave,
+  initialBook,
+}) {
+  const toast = useRef(null);
+
   const [form, setForm] = useState(() => getInitialForm(initialBook));
-  const [error, setError] = useState("");
 
   const isEditing = Boolean(initialBook);
 
@@ -42,8 +49,15 @@ export default function BookFormDialog({ visible, onHide, onSave, initialBook })
       ...form,
       [field]: value,
     });
+  }
 
-    setError("");
+  function showValidationMessage(message) {
+    toast.current.show({
+      severity: "warn",
+      summary: "Validación",
+      detail: message,
+      life: 3000,
+    });
   }
 
   function validateForm() {
@@ -67,13 +81,14 @@ export default function BookFormDialog({ visible, onHide, onSave, initialBook })
       return "El stock no puede ser negativo.";
     }
 
+    if (!form.cover.trim()) {
+      return "La URL de imagen es obligatoria.";
+    }
+    
     if (!form.description.trim()) {
       return "La descripción es obligatoria.";
     }
 
-    if (!form.cover.trim()) {
-      return "La URL de imagen es obligatoria.";
-    }
 
     return "";
   }
@@ -84,7 +99,7 @@ export default function BookFormDialog({ visible, onHide, onSave, initialBook })
     const validationError = validateForm();
 
     if (validationError) {
-      setError(validationError);
+      showValidationMessage(validationError);
       return;
     }
 
@@ -110,121 +125,123 @@ export default function BookFormDialog({ visible, onHide, onSave, initialBook })
   );
 
   return (
-    <Dialog
-      header={isEditing ? "Editar libro" : "Agregar libro"}
-      visible={visible}
-      style={{ width: "42rem" }}
-      modal
-      footer={footer}
-      onHide={onHide}
-    >
-      <form onSubmit={handleSubmit} className="space-y-5 pt-2">
-        <div className="grid gap-4 md:grid-cols-2">
+    <>
+      <Toast ref={toast} />
+
+      <Dialog
+        header={isEditing ? "Editar libro" : "Agregar libro"}
+        visible={visible}
+        style={{ width: "42rem" }}
+        modal
+        footer={footer}
+        onHide={onHide}
+      >
+        <form onSubmit={handleSubmit} className="space-y-5 pt-2">
+          <div className="grid gap-4 md:grid-cols-2">
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700">
+                Título
+              </label>
+
+              <InputText
+                value={form.title}
+                onChange={(event) => updateField("title", event.target.value)}
+                className="w-full"
+                placeholder="Ej: El principito"
+              />
+            </div>
+
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700">
+                Autor
+              </label>
+
+              <InputText
+                value={form.author}
+                onChange={(event) => updateField("author", event.target.value)}
+                className="w-full"
+                placeholder="Ej: Antoine de Saint-Exupéry"
+              />
+            </div>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-3">
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700">
+                Género
+              </label>
+
+              <InputText
+                value={form.genre}
+                onChange={(event) => updateField("genre", event.target.value)}
+                className="w-full"
+                placeholder="Ficción"
+              />
+            </div>
+
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700">
+                Año
+              </label>
+
+              <InputNumber
+                value={Number(form.year) || null}
+                onValueChange={(event) => updateField("year", event.value)}
+                useGrouping={false}
+                className="w-full"
+                inputClassName="w-full"
+                placeholder="1943"
+              />
+            </div>
+
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700">
+                Stock
+              </label>
+
+              <InputNumber
+                value={Number(form.stock)}
+                onValueChange={(event) =>
+                  updateField("stock", event.value ?? 0)
+                }
+                min={0}
+                useGrouping={false}
+                className="w-full"
+                inputClassName="w-full"
+              />
+            </div>
+          </div>
+
           <div>
             <label className="mb-1 block text-sm font-medium text-slate-700">
-              Título
+              URL de imagen
             </label>
 
             <InputText
-              value={form.title}
-              onChange={(event) => updateField("title", event.target.value)}
+              value={form.cover}
+              onChange={(event) => updateField("cover", event.target.value)}
               className="w-full"
-              placeholder="Ej: El principito"
+              placeholder="https://..."
             />
           </div>
 
           <div>
             <label className="mb-1 block text-sm font-medium text-slate-700">
-              Autor
+              Descripción
             </label>
 
-            <InputText
-              value={form.author}
-              onChange={(event) => updateField("author", event.target.value)}
+            <InputTextarea
+              value={form.description}
+              onChange={(event) =>
+                updateField("description", event.target.value)
+              }
+              rows={4}
               className="w-full"
-              placeholder="Ej: Antoine de Saint-Exupéry"
+              placeholder="Breve descripción del libro..."
             />
           </div>
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-3">
-          <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700">
-              Género
-            </label>
-
-            <InputText
-              value={form.genre}
-              onChange={(event) => updateField("genre", event.target.value)}
-              className="w-full"
-              placeholder="Ficción"
-            />
-          </div>
-
-          <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700">
-              Año
-            </label>
-
-            <InputNumber
-              value={Number(form.year) || null}
-              onValueChange={(event) => updateField("year", event.value)}
-              useGrouping={false}
-              className="w-full"
-              inputClassName="w-full"
-              placeholder="1943"
-            />
-          </div>
-
-          <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700">
-              Stock
-            </label>
-
-            <InputNumber
-              value={Number(form.stock)}
-              onValueChange={(event) => updateField("stock", event.value ?? 0)}
-              min={0}
-              useGrouping={false}
-              className="w-full"
-              inputClassName="w-full"
-            />
-          </div>
-        </div>
-
-        <div>
-          <label className="mb-1 block text-sm font-medium text-slate-700">
-            URL de imagen
-          </label>
-
-          <InputText
-            value={form.cover}
-            onChange={(event) => updateField("cover", event.target.value)}
-            className="w-full"
-            placeholder="https://..."
-          />
-        </div>
-
-        <div>
-          <label className="mb-1 block text-sm font-medium text-slate-700">
-            Descripción
-          </label>
-
-          <InputTextarea
-            value={form.description}
-            onChange={(event) => updateField("description", event.target.value)}
-            rows={4}
-            className="w-full"
-            placeholder="Breve descripción del libro..."
-          />
-        </div>
-
-        {error && (
-          <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
-            {error}
-          </p>
-        )}
-      </form>
-    </Dialog>
+        </form>
+      </Dialog>
+    </>
   );
 }

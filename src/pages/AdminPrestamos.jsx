@@ -49,8 +49,9 @@ export default function AdminPrestamos() {
     const isApproved = rowData.status === "Aprobado";
 
     return (
-      <div className="flex flex-wrap gap-2">
+      <div className="flex gap-2">
         <Button
+        className="px-2! py-1!"
           label="Aprobar"
           icon="pi pi-check"
           severity="success"
@@ -61,6 +62,7 @@ export default function AdminPrestamos() {
         />
 
         <Button
+        className="px-2! py-1!"
           label="Rechazar"
           icon="pi pi-times"
           severity="danger"
@@ -71,6 +73,7 @@ export default function AdminPrestamos() {
         />
 
         <Button
+        className="px-2! py-1!"
           label="Devuelto"
           icon="pi pi-refresh"
           severity="info"

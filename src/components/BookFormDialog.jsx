@@ -84,11 +84,10 @@ export default function BookFormDialog({
     if (!form.cover.trim()) {
       return "La URL de imagen es obligatoria.";
     }
-    
+
     if (!form.description.trim()) {
       return "La descripción es obligatoria.";
     }
-
 
     return "";
   }
@@ -109,14 +108,17 @@ export default function BookFormDialog({
   const footer = (
     <div className="flex justify-end gap-2">
       <Button
+        className="px-2! py-1.5!"
         label="Cancelar"
         icon="pi pi-times"
         severity="secondary"
+        text
         outlined
         onClick={onHide}
       />
 
       <Button
+        className="px-2! py-1.5!"
         label={isEditing ? "Guardar cambios" : "Agregar libro"}
         icon="pi pi-check"
         onClick={handleSubmit}

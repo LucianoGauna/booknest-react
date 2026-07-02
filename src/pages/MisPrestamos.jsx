@@ -45,7 +45,7 @@ export default function MisPrestamos() {
         icon="pi pi-times"
         severity="danger"
         outlined
-        size="small"
+        className="px-2! py-1!"
         disabled={!canCancel}
         onClick={() => cancelLoan(rowData.id)}
       />

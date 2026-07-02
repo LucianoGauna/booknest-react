@@ -98,6 +98,7 @@ export default function AdminLibros() {
     return (
       <div className="flex flex-wrap gap-2">
         <Button
+          className="px-2! py-1!"
           label="Editar"
           icon="pi pi-pencil"
           severity="info"
@@ -107,6 +108,7 @@ export default function AdminLibros() {
         />
 
         <Button
+          className="px-2! py-1!"
           label="Eliminar"
           icon="pi pi-trash"
           severity="danger"
@@ -128,6 +130,7 @@ export default function AdminLibros() {
           description="Administrá el catálogo disponible para los usuarios de BookNest."
           action={
             <Button
+              className="px-2.5! py-1!"
               label="Agregar libro"
               icon="pi pi-plus"
               onClick={openCreateDialog}

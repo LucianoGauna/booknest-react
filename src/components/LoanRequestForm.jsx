@@ -90,6 +90,7 @@ export default function LoanRequestForm({ book, onSubmit }) {
             minDate={today}
             disabled={!hasStock}
             dateFormat="dd/mm/yy"
+            readOnlyInput
             showIcon
             placeholder="Seleccioná una fecha"
             className="w-full"
@@ -101,7 +102,7 @@ export default function LoanRequestForm({ book, onSubmit }) {
           <Message
             severity="warn"
             text="Este libro no tiene stock disponible en este momento."
-            className="mt-4 w-full justify-start"
+            className="my-4 w-full justify-start"
           />
         )}
 
@@ -110,7 +111,7 @@ export default function LoanRequestForm({ book, onSubmit }) {
           label="Solicitar préstamo"
           icon="pi pi-send"
           disabled={!hasStock}
-          className="mt-5 w-full"
+          className="mt-5! w-full"
         />
       </form>
     </>

@@ -144,3 +144,49 @@ src/
 ├── App.jsx
 ├── index.css
 └── main.jsx
+```
+
+## Instalación y ejecución
+
+Para instalar las dependencias del proyecto:
+
+```bash
+npm install
+```
+
+Para ejecutar la aplicación en modo desarrollo:
+
+```bash
+npm run dev
+```
+
+Luego abrir en el navegador:
+
+```txt
+http://localhost:5173
+```
+
+## Build de producción
+
+Para generar la versión de producción:
+
+```bash
+npm run build
+```
+
+## Captura de pantalla
+
+![Captura de BookNest](./public/screenshot.png)
+
+## Deploy
+
+Aplicación publicada en:
+
+```txt
+Agregar link del deploy
+````
+
+## Entrega
+
+- Repositorio: https://github.com/LucianoGauna/booknest-react
+- Deploy: Agregar link del deploy

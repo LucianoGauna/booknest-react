@@ -128,6 +128,7 @@ export default function Navbar() {
                   <NavLink
                     key={item.to}
                     to={item.to}
+                    end={item.end}
                     onClick={closeSidebar}
                     className={mobileNavLinkClass}
                   >

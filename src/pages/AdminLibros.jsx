@@ -96,7 +96,7 @@ export default function AdminLibros() {
 
   function actionsBodyTemplate(rowData) {
     return (
-      <div className="flex flex-wrap gap-2">
+      <div className="flex gap-2">
         <Button
           className="px-2! py-1!"
           label="Editar"

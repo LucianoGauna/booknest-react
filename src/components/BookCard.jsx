@@ -4,7 +4,7 @@ export default function BookCard({ book }) {
   const hasStock = book.stock > 0;
 
   return (
-    <article className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-md">
+    <article className="flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-md">
       <div className="h-48 overflow-hidden bg-slate-200">
         <img
           src={book.cover}
@@ -13,7 +13,7 @@ export default function BookCard({ book }) {
         />
       </div>
 
-      <div className="space-y-4 p-5">
+      <div className="flex flex-1 flex-col space-y-4 p-5">
         <div>
           <div className="mb-2 flex items-center justify-between gap-2">
             <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700">
@@ -46,7 +46,7 @@ export default function BookCard({ book }) {
 
         <Link
           to={`/libros/${book.id}`}
-          className="inline-flex w-full items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
+          className="mt-auto inline-flex w-full items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
         >
           Ver detalle
         </Link>

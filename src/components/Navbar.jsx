@@ -26,7 +26,7 @@ export default function Navbar() {
 
   const navItems = isAdmin
     ? [
-        { label: "Dashboard", to: "/admin" },
+        { label: "Dashboard", to: "/admin", end: true },
         { label: "Libros", to: "/admin/libros" },
         { label: "Préstamos", to: "/admin/prestamos" },
       ]
@@ -55,7 +55,12 @@ export default function Navbar() {
         <div className="hidden items-center gap-2 md:flex">
           {user &&
             navItems.map((item) => (
-              <NavLink key={item.to} to={item.to} className={navLinkClass}>
+              <NavLink
+                key={item.to}
+                to={item.to}
+                end={item.end}
+                className={navLinkClass}
+              >
                 {item.label}
               </NavLink>
             ))}

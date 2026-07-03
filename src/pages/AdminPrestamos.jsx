@@ -51,7 +51,7 @@ export default function AdminPrestamos() {
     return (
       <div className="flex gap-2">
         <Button
-        className="px-2! py-1!"
+          className="px-2! py-1!"
           label="Aprobar"
           icon="pi pi-check"
           severity="success"
@@ -62,7 +62,7 @@ export default function AdminPrestamos() {
         />
 
         <Button
-        className="px-2! py-1!"
+          className="px-2! py-1!"
           label="Rechazar"
           icon="pi pi-times"
           severity="danger"
@@ -73,7 +73,7 @@ export default function AdminPrestamos() {
         />
 
         <Button
-        className="px-2! py-1!"
+          className="px-2! py-1!"
           label="Devuelto"
           icon="pi pi-refresh"
           severity="info"
@@ -95,6 +95,7 @@ export default function AdminPrestamos() {
 
       <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
         <DataTable
+          dataKey="id"
           value={loansWithDetails}
           paginator
           rows={5}

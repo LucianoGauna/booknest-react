@@ -178,15 +178,8 @@ npm run build
 
 ![Captura de BookNest](./public/screenshot.png)
 
-## Deploy
-
-Aplicación publicada en:
-
-```txt
-Agregar link del deploy
-````
 
 ## Entrega
 
 - Repositorio: https://github.com/LucianoGauna/booknest-react
-- Deploy: Agregar link del deploy
+- Deploy: https://booknest-react-vert.vercel.app

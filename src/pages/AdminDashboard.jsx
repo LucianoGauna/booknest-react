@@ -134,7 +134,7 @@ export default function AdminDashboard() {
               <Button
                 label="Gestionar préstamos"
                 icon="pi pi-list"
-                severity="info"
+                severity="secondary"
                 className="w-full"
               />
             </Link>

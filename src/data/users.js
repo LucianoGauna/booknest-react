@@ -1,7 +1,7 @@
 export const users = [
   {
     id: 1,
-    name: "Administrador",
+    name: "Juan",
     email: "admin@booknest.com",
     password: "123456",
     role: "admin",

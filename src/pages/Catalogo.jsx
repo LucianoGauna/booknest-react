@@ -2,6 +2,7 @@ import { useState } from "react";
 import BookCard from "../components/BookCard";
 import PageHeader from "../components/PageHeader";
 import { useLibrary } from "../context/useLibrary";
+import { Dropdown } from "primereact/dropdown";
 
 export default function Catalogo() {
   const { books } = useLibrary();
@@ -46,7 +47,7 @@ export default function Catalogo() {
             value={search}
             onChange={(event) => setSearch(event.target.value)}
             placeholder="Ej: Orwell, El principito..."
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+            className="w-full rounded-lg border border-slate-300 p-3 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
           />
         </div>
 
@@ -58,18 +59,14 @@ export default function Catalogo() {
             Género
           </label>
 
-          <select
+          <Dropdown
             id="genre"
             value={selectedGenre}
-            onChange={(event) => setSelectedGenre(event.target.value)}
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-          >
-            {genres.map((genre) => (
-              <option key={genre} value={genre}>
-                {genre}
-              </option>
-            ))}
-          </select>
+            onChange={(event) => setSelectedGenre(event.value)}
+            options={genres}
+            placeholder="Seleccioná un género"
+            className="w-full"
+          />
         </div>
       </div>
 

@@ -49,8 +49,8 @@ export default function AdminLibros() {
       icon: "pi pi-exclamation-triangle",
       acceptLabel: "Eliminar",
       rejectLabel: "Cancelar",
-      acceptClassName: "p-button-danger",
-      rejectClassName: "p-button-secondary p-button-outlined",
+      acceptClassName: "p-button-danger py-1.5! px-2!",
+      rejectClassName: "p-button-secondary p-button-outlined py-1.5! px-2!",
       accept: () => {
         deleteBook(book.id);
 

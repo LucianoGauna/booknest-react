@@ -140,6 +140,7 @@ export default function AdminLibros() {
 
         <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
           <DataTable
+            dataKey="id"
             value={books}
             paginator
             rows={5}

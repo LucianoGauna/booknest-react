@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { books as initialBooks } from "../data/books";
 import { loans as initialLoans } from "../data/loans";
 import { LibraryContext } from "./useLibrary";
@@ -25,17 +25,24 @@ export function LibraryProvider({ children }) {
     getStoredData(LOANS_STORAGE_KEY, initialLoans),
   );
 
+  const booksRef = useRef(books);
+  const loansRef = useRef(loans);
+
   function saveBooks(nextBooks) {
+    booksRef.current = nextBooks;
     setBooks(nextBooks);
     localStorage.setItem(BOOKS_STORAGE_KEY, JSON.stringify(nextBooks));
   }
 
   function saveLoans(nextLoans) {
+    loansRef.current = nextLoans;
     setLoans(nextLoans);
     localStorage.setItem(LOANS_STORAGE_KEY, JSON.stringify(nextLoans));
   }
 
   function addBook(bookData) {
+    const currentBooks = booksRef.current;
+
     const newBook = {
       id: Date.now(),
       ...bookData,
@@ -43,11 +50,13 @@ export function LibraryProvider({ children }) {
       stock: Number(bookData.stock),
     };
 
-    saveBooks([...books, newBook]);
+    saveBooks([...currentBooks, newBook]);
   }
 
   function updateBook(bookId, bookData) {
-    const nextBooks = books.map((book) =>
+    const currentBooks = booksRef.current;
+
+    const nextBooks = currentBooks.map((book) =>
       book.id === Number(bookId)
         ? {
             ...book,
@@ -62,12 +71,17 @@ export function LibraryProvider({ children }) {
   }
 
   function deleteBook(bookId) {
-    const nextBooks = books.filter((book) => book.id !== Number(bookId));
+    const currentBooks = booksRef.current;
+    const nextBooks = currentBooks.filter((book) => book.id !== Number(bookId));
+
     saveBooks(nextBooks);
   }
 
   function requestLoan({ userId, bookId, returnDate }) {
-    const hasActiveLoan = loans.some(
+    const currentBooks = booksRef.current;
+    const currentLoans = loansRef.current;
+
+    const hasActiveLoan = currentLoans.some(
       (loan) =>
         loan.userId === Number(userId) &&
         loan.bookId === Number(bookId) &&
@@ -81,7 +95,7 @@ export function LibraryProvider({ children }) {
       };
     }
 
-    const book = books.find((item) => item.id === Number(bookId));
+    const book = currentBooks.find((item) => item.id === Number(bookId));
 
     if (!book || book.stock <= 0) {
       return {
@@ -99,7 +113,7 @@ export function LibraryProvider({ children }) {
       status: "Pendiente",
     };
 
-    saveLoans([...loans, newLoan]);
+    saveLoans([...currentLoans, newLoan]);
 
     return {
       success: true,
@@ -108,7 +122,9 @@ export function LibraryProvider({ children }) {
   }
 
   function cancelLoan(loanId) {
-    const nextLoans = loans.map((loan) =>
+    const currentLoans = loansRef.current;
+
+    const nextLoans = currentLoans.map((loan) =>
       loan.id === Number(loanId) ? { ...loan, status: "Cancelado" } : loan,
     );
 
@@ -116,29 +132,34 @@ export function LibraryProvider({ children }) {
   }
 
   function updateLoanStatus(loanId, status) {
-    const loan = loans.find((item) => item.id === Number(loanId));
+    const currentBooks = booksRef.current;
+    const currentLoans = loansRef.current;
+
+    const loan = currentLoans.find((item) => item.id === Number(loanId));
 
     if (!loan) {
       return;
     }
 
-    const nextLoans = loans.map((item) =>
+    const nextLoans = currentLoans.map((item) =>
       item.id === Number(loanId) ? { ...item, status } : item,
     );
 
-    let nextBooks = books;
+    let nextBooks = currentBooks;
 
     if (status === "Aprobado" && loan.status !== "Aprobado") {
-      nextBooks = books.map((book) =>
+      nextBooks = currentBooks.map((book) =>
         book.id === loan.bookId
-          ? { ...book, stock: Math.max(book.stock - 1, 0) }
+          ? { ...book, stock: Math.max(Number(book.stock) - 1, 0) }
           : book,
       );
     }
 
     if (status === "Devuelto" && loan.status === "Aprobado") {
-      nextBooks = books.map((book) =>
-        book.id === loan.bookId ? { ...book, stock: book.stock + 1 } : book,
+      nextBooks = currentBooks.map((book) =>
+        book.id === loan.bookId
+          ? { ...book, stock: Number(book.stock) + 1 }
+          : book,
       );
     }
 

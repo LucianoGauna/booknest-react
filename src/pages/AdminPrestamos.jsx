@@ -45,33 +45,34 @@ export default function AdminPrestamos() {
   }
 
   function actionsBodyTemplate(rowData) {
-    const isPending = rowData.status === "Pendiente";
-    const isApproved = rowData.status === "Aprobado";
+    if (rowData.status === "Pendiente") {
+      return (
+        <div className="flex gap-2">
+          <Button
+            className="px-2! py-1!"
+            label="Aprobar"
+            icon="pi pi-check"
+            severity="success"
+            outlined
+            size="small"
+            onClick={() => updateLoanStatus(rowData.id, "Aprobado")}
+          />
 
-    return (
-      <div className="flex gap-2">
-        <Button
-          className="px-2! py-1!"
-          label="Aprobar"
-          icon="pi pi-check"
-          severity="success"
-          outlined
-          size="small"
-          disabled={!isPending}
-          onClick={() => updateLoanStatus(rowData.id, "Aprobado")}
-        />
+          <Button
+            className="px-2! py-1!"
+            label="Rechazar"
+            icon="pi pi-times"
+            severity="danger"
+            outlined
+            size="small"
+            onClick={() => updateLoanStatus(rowData.id, "Rechazado")}
+          />
+        </div>
+      );
+    }
 
-        <Button
-          className="px-2! py-1!"
-          label="Rechazar"
-          icon="pi pi-times"
-          severity="danger"
-          outlined
-          size="small"
-          disabled={!isPending}
-          onClick={() => updateLoanStatus(rowData.id, "Rechazado")}
-        />
-
+    if (rowData.status === "Aprobado") {
+      return (
         <Button
           className="px-2! py-1!"
           label="Devuelto"
@@ -79,11 +80,12 @@ export default function AdminPrestamos() {
           severity="info"
           outlined
           size="small"
-          disabled={!isApproved}
           onClick={() => updateLoanStatus(rowData.id, "Devuelto")}
         />
-      </div>
-    );
+      );
+    }
+
+    return <span className="text-sm text-slate-400">Sin acciones</span>;
   }
 
   return (

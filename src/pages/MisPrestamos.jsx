@@ -107,6 +107,7 @@ export default function MisPrestamos() {
 
         <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
           <DataTable
+            dataKey="id"
             value={myLoans}
             paginator
             rows={5}

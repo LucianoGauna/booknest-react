@@ -51,15 +51,26 @@ export default function AdminLibros() {
       rejectLabel: "Cancelar",
       acceptClassName: "p-button-danger py-1.5! px-2!",
       rejectClassName: "p-button-secondary p-button-outlined py-1.5! px-2!",
-      accept: () => {
-        deleteBook(book.id);
+      accept: async () => {
+        try {
+          await deleteBook(book.id);
 
-        toast.current.show({
-          severity: "success",
-          summary: "Libro eliminado",
-          detail: `"${book.title}" fue eliminado correctamente.`,
-          life: 3000,
-        });
+          toast.current.show({
+            severity: "success",
+            summary: "Libro eliminado",
+            detail: `"${book.title}" fue eliminado correctamente.`,
+            life: 3000,
+          });
+        } catch (error) {
+          toast.current.show({
+            severity: "error",
+            summary: "No se pudo eliminar",
+            detail:
+              error.message ||
+              "No se pudo eliminar el libro porque tiene préstamos activos.",
+            life: 4000,
+          });
+        }
       },
     });
   }

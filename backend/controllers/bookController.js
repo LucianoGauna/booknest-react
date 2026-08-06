@@ -1,4 +1,5 @@
 import Book from "../models/Book.js";
+import Loan from "../models/Loan.js";
 
 export async function getBooks(req, res) {
   try {
@@ -69,6 +70,18 @@ export async function updateBook(req, res) {
 
 export async function deleteBook(req, res) {
   try {
+    const activeLoans = await Loan.countDocuments({
+      book: req.params.id,
+      status: { $in: ["Pendiente", "Aprobado"] },
+    });
+
+    if (activeLoans > 0) {
+      return res.status(400).json({
+        message:
+          "No se puede eliminar el libro porque tiene préstamos pendientes o aprobados",
+      });
+    }
+
     const book = await Book.findByIdAndDelete(req.params.id);
 
     if (!book) {

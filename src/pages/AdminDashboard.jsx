@@ -4,7 +4,6 @@ import { Tag } from "primereact/tag";
 import { Button } from "primereact/button";
 import PageHeader from "../components/PageHeader";
 import LoanStatusTag from "../components/LoanStatusTag";
-import { users } from "../data/users";
 import { useLibrary } from "../context/useLibrary";
 
 export default function AdminDashboard() {
@@ -12,21 +11,15 @@ export default function AdminDashboard() {
 
   const totalBooks = books.length;
   const totalStock = books.reduce((acc, book) => acc + Number(book.stock), 0);
-  const pendingLoans = loans.filter((loan) => loan.status === "Pendiente").length;
-  const approvedLoans = loans.filter((loan) => loan.status === "Aprobado").length;
+  const pendingLoans = loans.filter(
+    (loan) => loan.status === "Pendiente",
+  ).length;
+  const approvedLoans = loans.filter(
+    (loan) => loan.status === "Aprobado",
+  ).length;
   const outOfStockBooks = books.filter((book) => book.stock === 0).length;
 
-  const latestLoans = loans.slice(-5).reverse();
-
-  function getBookTitle(bookId) {
-    const book = books.find((item) => item.id === bookId);
-    return book?.title || "Libro eliminado";
-  }
-
-  function getUserName(userId) {
-    const user = users.find((item) => item.id === userId);
-    return user?.name || "Usuario eliminado";
-  }
+  const latestLoans = loans.slice(0, 5);
 
   return (
     <section>
@@ -81,7 +74,12 @@ export default function AdminDashboard() {
             </div>
 
             <Link to="/admin/prestamos">
-              <Button className="px-2! py-1!" label="Ver todos" icon="pi pi-arrow-right" outlined />
+              <Button
+                className="px-2! py-1!"
+                label="Ver todos"
+                icon="pi pi-arrow-right"
+                outlined
+              />
             </Link>
           </div>
 
@@ -94,11 +92,10 @@ export default function AdminDashboard() {
                 >
                   <div>
                     <p className="font-semibold text-slate-900">
-                      {getBookTitle(loan.bookId)}
+                      {loan.bookTitle}
                     </p>
                     <p className="mt-1 text-sm text-slate-500">
-                      {getUserName(loan.userId)} · Solicitud:{" "}
-                      {loan.requestDate}
+                      {loan.userName} · Solicitud: {loan.requestDate}
                     </p>
                   </div>
 

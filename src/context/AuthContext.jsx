@@ -1,44 +1,47 @@
 import { useState } from "react";
-import { users } from "../data/users";
+import {
+  apiRequest,
+  clearAuthData,
+  saveAuthData,
+  USER_STORAGE_KEY,
+} from "../services/api";
 import { AuthContext } from "./useAuth";
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
-    const storedUser = localStorage.getItem("booknest_user");
+    const storedUser = localStorage.getItem(USER_STORAGE_KEY);
     return storedUser ? JSON.parse(storedUser) : null;
   });
 
-  function login(email, password) {
-    const foundUser = users.find(
-      (item) => item.email === email && item.password === password,
-    );
+  async function login(email, password) {
+    try {
+      const data = await apiRequest("/auth/login", {
+        method: "POST",
+        body: { email, password },
+      });
 
-    if (!foundUser) {
+      saveAuthData({
+        token: data.token,
+        user: data.user,
+      });
+
+      setUser(data.user);
+
+      return {
+        success: true,
+        user: data.user,
+      };
+    } catch (error) {
       return {
         success: false,
-        message: "Email o contraseña incorrectos.",
+        message: error.message || "Email o contraseña incorrectos.",
       };
     }
-
-    const userToSave = {
-      id: foundUser.id,
-      name: foundUser.name,
-      email: foundUser.email,
-      role: foundUser.role,
-    };
-
-    setUser(userToSave);
-    localStorage.setItem("booknest_user", JSON.stringify(userToSave));
-
-    return {
-      success: true,
-      user: userToSave,
-    };
   }
 
   function logout() {
     setUser(null);
-    localStorage.removeItem("booknest_user");
+    clearAuthData();
   }
 
   const isAuthenticated = Boolean(user);

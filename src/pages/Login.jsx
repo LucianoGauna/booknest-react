@@ -24,7 +24,7 @@ export default function Login() {
     setError("");
   }
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
 
     if (!form.email.trim() || !form.password.trim()) {
@@ -32,7 +32,7 @@ export default function Login() {
       return;
     }
 
-    const result = login(form.email, form.password);
+    const result = await login(form.email, form.password);
 
     if (!result.success) {
       setError(result.message);
@@ -56,7 +56,7 @@ export default function Login() {
           </p>
         </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div>
             <label
               htmlFor="email"

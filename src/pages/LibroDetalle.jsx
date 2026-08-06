@@ -11,7 +11,7 @@ export default function LibroDetalle() {
   const { user } = useAuth();
   const { books, requestLoan } = useLibrary();
 
-  const book = books.find((item) => item.id === Number(id));
+  const book = books.find((item) => item.id === id);
 
   if (!book) {
     return (

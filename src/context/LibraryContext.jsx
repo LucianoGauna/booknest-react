@@ -1,177 +1,109 @@
-import { useRef, useState } from "react";
-import { books as initialBooks } from "../data/books";
-import { loans as initialLoans } from "../data/loans";
+import { useCallback, useEffect, useState } from "react";
+import { apiRequest } from "../services/api";
 import { LibraryContext } from "./useLibrary";
 
-const BOOKS_STORAGE_KEY = "booknest_books";
-const LOANS_STORAGE_KEY = "booknest_loans";
+function normalizeBook(book) {
+  return {
+    ...book,
+    id: book._id || book.id,
+    cover: book.coverUrl || book.cover,
+  };
+}
 
-function getStoredData(key, fallbackData) {
-  const storedData = localStorage.getItem(key);
-
-  if (!storedData) {
-    return fallbackData;
-  }
-
-  return JSON.parse(storedData);
+function toBookPayload(bookData) {
+  return {
+    title: bookData.title,
+    author: bookData.author,
+    genre: bookData.genre,
+    year: Number(bookData.year),
+    stock: Number(bookData.stock),
+    description: bookData.description,
+    coverUrl: bookData.cover || bookData.coverUrl,
+  };
 }
 
 export function LibraryProvider({ children }) {
-  const [books, setBooks] = useState(() =>
-    getStoredData(BOOKS_STORAGE_KEY, initialBooks),
-  );
+  const [books, setBooks] = useState([]);
+  const [loans] = useState([]);
+  const [loadingBooks, setLoadingBooks] = useState(true);
 
-  const [loans, setLoans] = useState(() =>
-    getStoredData(LOANS_STORAGE_KEY, initialLoans),
-  );
+  const loadBooks = useCallback(async () => {
+    setLoadingBooks(true);
 
-  const booksRef = useRef(books);
-  const loansRef = useRef(loans);
+    try {
+      const data = await apiRequest("/books");
+      setBooks(data.map(normalizeBook));
+    } finally {
+      setLoadingBooks(false);
+    }
+  }, []);
 
-  function saveBooks(nextBooks) {
-    booksRef.current = nextBooks;
-    setBooks(nextBooks);
-    localStorage.setItem(BOOKS_STORAGE_KEY, JSON.stringify(nextBooks));
-  }
-
-  function saveLoans(nextLoans) {
-    loansRef.current = nextLoans;
-    setLoans(nextLoans);
-    localStorage.setItem(LOANS_STORAGE_KEY, JSON.stringify(nextLoans));
-  }
-
-  function addBook(bookData) {
-    const currentBooks = booksRef.current;
-
-    const newBook = {
-      id: Date.now(),
-      ...bookData,
-      year: Number(bookData.year),
-      stock: Number(bookData.stock),
-    };
-
-    saveBooks([...currentBooks, newBook]);
-  }
-
-  function updateBook(bookId, bookData) {
-    const currentBooks = booksRef.current;
-
-    const nextBooks = currentBooks.map((book) =>
-      book.id === Number(bookId)
-        ? {
-            ...book,
-            ...bookData,
-            year: Number(bookData.year),
-            stock: Number(bookData.stock),
-          }
-        : book,
-    );
-
-    saveBooks(nextBooks);
-  }
-
-  function deleteBook(bookId) {
-    const currentBooks = booksRef.current;
-    const nextBooks = currentBooks.filter((book) => book.id !== Number(bookId));
-
-    saveBooks(nextBooks);
-  }
-
-  function requestLoan({ userId, bookId, returnDate }) {
-    const currentBooks = booksRef.current;
-    const currentLoans = loansRef.current;
-
-    const hasActiveLoan = currentLoans.some(
-      (loan) =>
-        loan.userId === Number(userId) &&
-        loan.bookId === Number(bookId) &&
-        ["Pendiente", "Aprobado"].includes(loan.status),
-    );
-
-    if (hasActiveLoan) {
-      return {
-        success: false,
-        message: "Ya tenés una solicitud activa para este libro.",
-      };
+  useEffect(() => {
+    async function loadInitialBooks() {
+      try {
+        const data = await apiRequest("/books");
+        setBooks(data.map(normalizeBook));
+      } finally {
+        setLoadingBooks(false);
+      }
     }
 
-    const book = currentBooks.find((item) => item.id === Number(bookId));
+    loadInitialBooks();
+  }, []);
 
-    if (!book || book.stock <= 0) {
-      return {
-        success: false,
-        message: "El libro no tiene stock disponible.",
-      };
-    }
+  async function addBook(bookData) {
+    const createdBook = await apiRequest("/books", {
+      method: "POST",
+      body: toBookPayload(bookData),
+      auth: true,
+    });
 
-    const newLoan = {
-      id: Date.now(),
-      userId: Number(userId),
-      bookId: Number(bookId),
-      requestDate: new Date().toISOString().slice(0, 10),
-      returnDate,
-      status: "Pendiente",
-    };
+    setBooks((currentBooks) => [normalizeBook(createdBook), ...currentBooks]);
+  }
 
-    saveLoans([...currentLoans, newLoan]);
+  async function updateBook(bookId, bookData) {
+    const updatedBook = await apiRequest(`/books/${bookId}`, {
+      method: "PUT",
+      body: toBookPayload(bookData),
+      auth: true,
+    });
 
+    setBooks((currentBooks) =>
+      currentBooks.map((book) =>
+        book.id === bookId ? normalizeBook(updatedBook) : book,
+      ),
+    );
+  }
+
+  async function deleteBook(bookId) {
+    await apiRequest(`/books/${bookId}`, {
+      method: "DELETE",
+      auth: true,
+    });
+
+    setBooks((currentBooks) =>
+      currentBooks.filter((book) => book.id !== bookId),
+    );
+  }
+
+  async function requestLoan() {
     return {
-      success: true,
-      loan: newLoan,
+      success: false,
+      message: "La gestión de préstamos se conectará en el siguiente paso.",
     };
   }
 
-  function cancelLoan(loanId) {
-    const currentLoans = loansRef.current;
+  async function cancelLoan() {}
 
-    const nextLoans = currentLoans.map((loan) =>
-      loan.id === Number(loanId) ? { ...loan, status: "Cancelado" } : loan,
-    );
-
-    saveLoans(nextLoans);
-  }
-
-  function updateLoanStatus(loanId, status) {
-    const currentBooks = booksRef.current;
-    const currentLoans = loansRef.current;
-
-    const loan = currentLoans.find((item) => item.id === Number(loanId));
-
-    if (!loan) {
-      return;
-    }
-
-    const nextLoans = currentLoans.map((item) =>
-      item.id === Number(loanId) ? { ...item, status } : item,
-    );
-
-    let nextBooks = currentBooks;
-
-    if (status === "Aprobado" && loan.status !== "Aprobado") {
-      nextBooks = currentBooks.map((book) =>
-        book.id === loan.bookId
-          ? { ...book, stock: Math.max(Number(book.stock) - 1, 0) }
-          : book,
-      );
-    }
-
-    if (status === "Devuelto" && loan.status === "Aprobado") {
-      nextBooks = currentBooks.map((book) =>
-        book.id === loan.bookId
-          ? { ...book, stock: Number(book.stock) + 1 }
-          : book,
-      );
-    }
-
-    saveLoans(nextLoans);
-    saveBooks(nextBooks);
-  }
+  async function updateLoanStatus() {}
 
   return (
     <LibraryContext.Provider
       value={{
         books,
         loans,
+        loadingBooks,
+        loadBooks,
         addBook,
         updateBook,
         deleteBook,

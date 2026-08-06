@@ -35,7 +35,7 @@ export default function LoanRequestForm({ book, onSubmit }) {
     });
   }
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
 
     if (!returnDate) {
@@ -51,10 +51,12 @@ export default function LoanRequestForm({ book, onSubmit }) {
     }
 
     const formattedReturnDate = formatDateToInputValue(returnDate);
-    const result = onSubmit(formattedReturnDate);
+    const result = await onSubmit(formattedReturnDate);
 
     if (!result.success) {
-      showValidationMessage(result.message);
+      showValidationMessage(
+        result.message || "No se pudo solicitar el préstamo.",
+      );
     }
   }
 
@@ -66,9 +68,7 @@ export default function LoanRequestForm({ book, onSubmit }) {
         onSubmit={handleSubmit}
         className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
       >
-        <h2 className="text-xl font-bold text-slate-900">
-          Solicitar préstamo
-        </h2>
+        <h2 className="text-xl font-bold text-slate-900">Solicitar préstamo</h2>
 
         <p className="mt-2 text-sm text-slate-500">
           Elegí una fecha estimada para devolver el libro. La solicitud quedará

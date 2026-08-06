@@ -34,9 +34,8 @@ export default function LibroDetalle() {
   const hasStock = book.stock > 0;
   const canRequestLoan = user?.role === "user";
 
-  function handleRequestLoan(returnDate) {
-    const result = requestLoan({
-      userId: user.id,
+  async function handleRequestLoan(returnDate) {
+    const result = await requestLoan({
       bookId: book.id,
       returnDate,
     });

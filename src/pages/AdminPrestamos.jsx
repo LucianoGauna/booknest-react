@@ -3,24 +3,10 @@ import { Column } from "primereact/column";
 import { DataTable } from "primereact/datatable";
 import LoanStatusTag from "../components/LoanStatusTag";
 import PageHeader from "../components/PageHeader";
-import { users } from "../data/users";
 import { useLibrary } from "../context/useLibrary";
 
 export default function AdminPrestamos() {
-  const { books, loans, updateLoanStatus } = useLibrary();
-
-  const loansWithDetails = loans.map((loan) => {
-    const book = books.find((item) => item.id === loan.bookId);
-    const user = users.find((item) => item.id === loan.userId);
-
-    return {
-      ...loan,
-      bookTitle: book?.title || "Libro eliminado",
-      bookAuthor: book?.author || "-",
-      userName: user?.name || "Usuario eliminado",
-      userEmail: user?.email || "-",
-    };
-  });
+  const { loans, updateLoanStatus } = useLibrary();
 
   function userBodyTemplate(rowData) {
     return (
@@ -98,7 +84,7 @@ export default function AdminPrestamos() {
       <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
         <DataTable
           dataKey="id"
-          value={loansWithDetails}
+          value={loans}
           paginator
           rows={5}
           emptyMessage="No hay préstamos registrados."
